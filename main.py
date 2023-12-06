@@ -11,17 +11,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 
-def build_hash_table(strings):
-    hash_table = {}
-    for string in strings:
-        hash_value = hash(string)  # Calculate the hash value for the string
-        hash_table[hash_value] = string  # Store the string in the hash table using the hash value as the key
-    return hash_table
-
-def check_string_in_list(string, hash_table):
-    hash_value = hash(string)  # Calculate the hash value for the string
-    return hash_value in hash_table  # Check if the hash value exists in the hash table
-
 def read_list_from_file(filename):
     with open(filename, 'r') as file:
         data = file.readlines()
@@ -34,10 +23,6 @@ def write_list_to_file(filename, data):
         file.write('\n'.join(data))
 
 filename = "users.txt"
-# Get the Selenium logger
-#logging.getLogger('selenium').setLevel(logging.WARNING)
-#logging.getLogger("requests").setLevel(logging.WARNING)
-#logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 # Disable logging for the Chrome driver
 logging.getLogger("selenium.webdriver.remote.remote_connection").setLevel(logging.WARNING)
@@ -47,19 +32,6 @@ userName = "Username"
 password = "Password"
 commentFriend = "N"
 
-# Enter Username
-#print("Enter Username:")
-#userName = input()
-
-# Enter Password
-#print("Enter Password:")
-#password = input()
-
-#print("How many friends you want to add:")
-#amountFriend = int(input())
-
-#print("Send default comment on friend page? Y/N")
-#commentFriend = input().upper()
 
 # Set up Chrome options
 chrome_options = Options()
@@ -82,7 +54,7 @@ driver.find_element(By.ID, "login-password").send_keys(password + Keys.ENTER)
 time.sleep(1)
 login = len(driver.find_elements(By.CLASS_NAME, "badresult"))
 dataset = read_list_from_file(filename)
-hash_table = build_hash_table(dataset)
+string_set = set(dataset)
 start = time.time()
 if login == 0:
     amountFriendCounter = 0
@@ -97,7 +69,7 @@ if login == 0:
         for friend in friends:
             urlName = friend.text
             dataset = read_list_from_file(filename)
-            if check_string_in_list(urlName, hash_table):
+            if urlName in string_set:
                 print(f"Checked Duplicate: {friend.text}")
                 continue
             driver.execute_script("window.open();")
@@ -135,8 +107,7 @@ if login == 0:
                 print(urlName + " is already a friend of yours")
                 dataset.append(urlName)
                 write_list_to_file(filename, dataset)
-                hash_value = hash(urlName)  
-                hash_table[hash_value] = urlName
+                string_set.add(urlName)
                 driver.close()
                 driver.switch_to.window(tabs[0])
                 continue
@@ -165,8 +136,7 @@ if login == 0:
                 print(urlName + " Added")
                 dataset.append(urlName)
                 write_list_to_file(filename, dataset)
-                hash_value = hash(urlName)  
-                hash_table[hash_value] = urlName
+                string_set.add(urlName)
                 end = time.time()
                 executiontime = end - start
                 sleeptime = random.randint(25,36)-executiontime
