@@ -34,7 +34,7 @@ To run this project, you will need to add the following variables to .env
 **Clone the repository**:
     
         git clone https://github.com/Beeamo/MyAnimeList-FriendBot.git
-        cd Python-MyAnimeList-Bot
+        cd MyAnimeList-FriendBot
 
 **Install requirements**:
 
