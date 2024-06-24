@@ -1,40 +1,58 @@
 
-# Python MyAnimeList Bot
+# MyAnimeList FriendBot
 
-This is a python rewrite of https://github.com/Lastmentor/MyAnimeList_FriendBot 
+This is a Python rewrite of [Lastmentor/MyAnimeList_FriendBot](https://github.com/Lastmentor/MyAnimeList_FriendBot).
 
-It was very inefficient and didn't actually add the people it stated it did.
+The original code was very simple and led to some issues with usage. This version includes several improvements to enhance functionality and reliability.
+
 
 ## Improvements
-- Simple Cache - Adds users only once
-- Random Add Intervals - More Friend Requests go through
+- **Cache**: Ensures users are added only once to avoid duplicates.
+- **Randomized Interval & Retry**: Increases the success rate of friend requests.
+- **Automatic Chromedriver Updates**: Ensures that the chromedriver is always up to date.
 
 
 
 
 ## Contributing
 
-Feel free to contribute any improvements you may have. The code is very simple and can be improved tremenously.
+Feel free to fork the repository and submit pull requests with any changes or improvements you may have.
 
 
 ## Variables
 
-To run this project, you will need to add the following variables to your main.py file
+To run this project, you will need to add the following variables to .env
 
-`Username`
+`MALusername`
 
-`Password`
+`MALpassword`
 
 
 
 ## Installation
 
-Install latest webdriver from https://chromedriver.chromium.org/downloads
-
-Install requirements and run
-
-```git
-  pip install -r requirements.txt
-  python main.py
-```
+**Clone the repository**:
     
+        git clone https://github.com/Beeamo/MyAnimeList-FriendBot.git
+        cd Python-MyAnimeList-Bot
+
+**Install requirements**:
+
+    pip install -r requirements.txt
+
+## Running the Bot
+
+The code supports several runtime arguments:
+
+- `--visible` to run the browser in visible mode (default is headless mode).
+- `-n VALUE` to specify the number of friends to add (default is 20).
+- `--message` to provide an optional message to post to profiles.
+- `--username` to override the `.env` username.
+- `--password` to override the `.env` password.
+
+### Example
+
+To run the bot with all arguments:
+
+```sh
+python main.py --visible -n 25 --message "Hello, it's nice to meet you" --username example --password password
