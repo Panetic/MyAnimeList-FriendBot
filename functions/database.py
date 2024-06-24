@@ -61,17 +61,3 @@ class Database:
 
     def __del__(self):
         self.db.close()
-
-# Example usage:
-if __name__ == "__main__":
-    db = Database()
-    
-    # Add some users to the database
-    db.add_user("Alice")
-    db.add_user("Bob")
-    db.add_user("Charlie")
-    
-    # Check users against the database
-    users_to_check = ["Alice", "David", "Charlie", "Eve"]
-    new_users = db.user_check(users_to_check)
-    print("New users:", new_users)  # Output should be: ['David', 'Eve']
