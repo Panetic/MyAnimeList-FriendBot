@@ -1,168 +1,50 @@
-import logging
-import time
-import random
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
-from selenium.webdriver.remote.remote_connection import LOGGER
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-import time
+from functions.database import Database
+from dotenv import load_dotenv
+from Client import MALFriendClient
+import os
+import sys
+import argparse
+load_dotenv()
+userTable = Database()
 
-def read_list_from_file(filename):
-    with open(filename, 'r') as file:
-        data = file.readlines()
-        # Remove newline characters and any leading/trailing whitespace
-        data = [line.strip() for line in data]
-    return data
+parser = argparse.ArgumentParser(description="MyAnimeList Friend Bot")
+parser.add_argument('-headless', action='store_true', help='Disable Chrome Visibility')
+parser.add_argument('-r', type=int, default=20, help='Number of Friends you wish to add.')
+parser.add_argument("--message", type=str, default=None, help="Message to send to prospective friends")
+parser.add_argument("--username", type=str, default=os.getenv("MALusername"), help="Username Login for MAL")
+parser.add_argument("--password", type=str, default=os.getenv("MALpassword"), help="password Login for MAL")
+args = parser.parse_args()
 
-def write_list_to_file(filename, data):
-    with open(filename, 'w') as file:
-        file.write('\n'.join(data))
+print(f"Settings:\nFriends to add: {args.n}\nmessage: {args.message}\nheadless: {args.headless}")
+settingcheck = input("Press Enter to Start. Other input will cancel\n")
+if settingcheck != "":
+    sys.exit(0)
 
-filename = "users.txt"
+client = MALFriendClient(headless=args.headless)
 
-# Disable logging for the Chrome driver
-logging.getLogger("selenium.webdriver.remote.remote_connection").setLevel(logging.WARNING)
+userUsername = args.username
+userPassword = args.password
 
-amountFriend = 5000
-userName = "Username"
-password = "Password"
-commentFriend = "N"
-
-
-# Set up Chrome options
-chrome_options = Options()
-chrome_options.add_argument("--headless")  # Run Chrome in headless mode
-chrome_options.add_argument("--log-level=3")
-
-# Set up Chrome driver
-driver_service = Service('')  # Replace 'path_to_chromedriver' with the actual path to chromedriver executable
-driver = webdriver.Chrome(service=driver_service, options=chrome_options)
-
-# Enter URL
-driver.maximize_window()
-driver.get("https://myanimelist.net/login.php")
-
-# Enter Username/Password
-driver.find_element(By.ID, "loginUserName").send_keys(userName)
-driver.find_element(By.ID, "login-password").send_keys(password + Keys.ENTER)
-
-# Check for login
-time.sleep(1)
-login = len(driver.find_elements(By.CLASS_NAME, "badresult"))
-dataset = read_list_from_file(filename)
-string_set = set(dataset)
-start = time.time()
-if login == 0:
-    amountFriendCounter = 0
-
-    # Navigate to Users
-    while True:
-        driver.get("https://myanimelist.net/users.php")
-        time.sleep(2)
-
-        friends = driver.find_elements(By.XPATH, "//*[@class='borderClass']/div[1]/a")
-
-        for friend in friends:
-            urlName = friend.text
-            dataset = read_list_from_file(filename)
-            if urlName in string_set:
-                print(f"Checked Duplicate: {friend.text}")
-                continue
-            driver.execute_script("window.open();")
-            tabs = driver.window_handles
-            driver.switch_to.window(tabs[1])
-            driver.get("https://myanimelist.net/profile" + "/" + urlName)
-
-            time.sleep(2)
-
-            # Check if user exists
-            is404 = len(driver.find_elements(By.CLASS_NAME, "error404"))
-
-            # Check if request is available
-            isRequest = len(driver.find_elements(By.CSS_SELECTOR, "[class*='icon-user-function icon-request js-user-function disabled']"))
-
-            # Check if already a friend
-            isFriend = len(driver.find_elements(By.CSS_SELECTOR, "[class*='icon-user-function icon-remove js-user-function']"))
-
-            # Check if comments are available
-            isComment = len(driver.find_elements(By.CLASS_NAME, "textarea"))
-
-            if is404 > 0:
-                print("There is no such a user name: " + urlName)
-                driver.close()
-                driver.switch_to.window(tabs[0])
-                continue
-
-            if isRequest > 0:
-                print(urlName + " Is Not Accepting Friend Request")
-                driver.close()
-                driver.switch_to.window(tabs[0])
-                continue
-
-            if isFriend > 0:
-                print(urlName + " is already a friend of yours")
-                dataset.append(urlName)
-                write_list_to_file(filename, dataset)
-                string_set.add(urlName)
-                driver.close()
-                driver.switch_to.window(tabs[0])
-                continue
-
-            if isComment > 0 and commentFriend == "Y":
-                # Add Some Comments
-                comments = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "textarea")))
-                comments.send_keys("Hi there, I like watching anime and talking about it so I'm looking for friends.")
-
-                submitButton = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//*[@id='lastcomment']/div/form/div/input")))
-                submitButton.click()
-
-                time.sleep(2)
-            elif isComment == 0 and commentFriend == "Y":
-                print("User Doesn't have Comments Turned On")
-            try:
-                # Send Friend Request
-                request = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//*[@id='request']")))
-                request.click()
-
-                request_Submit = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//*[@id='dialog']/tbody/tr/td/form/div[3]/input[1]")))
-                request_Submit.click()
-
-                amountFriendCounter += 1
-
-                print(urlName + " Added")
-                dataset.append(urlName)
-                write_list_to_file(filename, dataset)
-                string_set.add(urlName)
-                end = time.time()
-                executiontime = end - start
-                sleeptime = random.randint(25,36)-executiontime
-                time.sleep(sleeptime)
-                realend = time.time()
-                print(f"Check Time: {realend-start}")
-                start = time.time()
-            except:
-                continue
-
-            if amountFriendCounter == amountFriend:
-                driver.close()
-                driver.switch_to.window(tabs[0])
+login = client.mallogin(username=userUsername, password=userPassword)
+if login != 0:
+    client.closeclient()
+    print("Login Failed. Login Information likely wrong")
+    sys.exit()
+friends = 0
+while friends <= args.n:
+    users = client.getusers()
+    users = userTable.user_check(users)
+    if len(users) == 0:
+        continue
+    for username in users:
+        if client.adduser(username, message=args.message):
+            friends += 1
+            if friends >= args.n:
+                friends += 1
                 break
-            driver.close()
-            driver.switch_to.window(tabs[0])
+            print(f"{args.n-friends} friends left to go")
 
-        if amountFriendCounter != amountFriend:
-            print("Not All " + str(amountFriend) + " Friends Added Refreshing User Page")
-            continue
+print("All Friends added. Closing")
+sys.exit(0)
 
-        driver.execute_script("alert('All Friends Added Successfully! Program Closing In 3 Seconds');")
-        time.sleep(3)
-        driver.quit()
-        break
-else:
-    driver.execute_script("alert('Username/Password Is Wrong, Program Shutting Down In 2 Seconds');")
-    time.sleep(2)
-    driver.quit()
+    
