@@ -9,7 +9,7 @@ The original code was very simple and led to some issues with usage. This versio
 ## Improvements
 - **Cache**: Ensures users are added only once to avoid duplicates.
 - **Randomized Interval & Retry**: Increases the success rate of friend requests.
-- **Automatic Chromedriver Updates**: Ensures that the chromedriver is always up to date.
+- **Automatic Chromedriver Updates**: Ensures chromedriver is always up to date.
 
 
 
