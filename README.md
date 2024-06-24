@@ -55,4 +55,4 @@ The code supports several runtime arguments:
 To run the bot with all arguments:
 
 ```sh
-python main.py --visible -n 25 --message "Hello, it's nice to meet you" --username example --password password
+python main.py --visible -n 25 --message "Hello, let's be friends" --username example --password password
