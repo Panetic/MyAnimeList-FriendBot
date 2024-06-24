@@ -9,7 +9,7 @@ userTable = Database()
 
 parser = argparse.ArgumentParser(description="MyAnimeList Friend Bot")
 parser.add_argument('--headless', action='store_true', help='Disable Chrome Visibility')
-parser.add_argument('-r', type=int, default=20, help='Number of Friends you wish to add.')
+parser.add_argument('-n', type=int, default=20, help='Number of Friends you wish to add.')
 parser.add_argument("--message", type=str, default=None, help="Message to send to prospective friends")
 parser.add_argument("--username", type=str, default=os.getenv("MALusername"), help="Username Login for MAL")
 parser.add_argument("--password", type=str, default=os.getenv("MALpassword"), help="password Login for MAL")
