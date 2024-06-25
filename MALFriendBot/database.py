@@ -40,7 +40,7 @@ class Database:
         except sqlite3.IntegrityError:
             print(f"User '{username}' already exists in the database.")
 
-    def add_all_users(self, users: list):
+    def add_bulk_users(self, users: list):
         try:
             # Prepare data for bulk insertion
             data = [(user,) for user in users]
@@ -59,5 +59,5 @@ class Database:
             # Handle other exceptions
             print(f"Error occurred: {e}")
 
-    def __del__(self):
+    def close(self):
         self.db.close()
