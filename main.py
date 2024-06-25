@@ -45,6 +45,8 @@ while friends <= args.n:
             print(f"{args.n-friends} friends left to go")
 
 print("All Friends added. Closing")
+client.closeclient()
+userTable.close
 sys.exit(0)
 
     
