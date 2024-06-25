@@ -1,6 +1,6 @@
-from functions.database import Database
+from MALFriendBot.database import Database
+from MALFriendBot.Client import MALFriendClient
 from dotenv import load_dotenv
-from Client import MALFriendClient
 import os
 import sys
 import argparse
@@ -45,6 +45,8 @@ while friends <= args.n:
             print(f"{args.n-friends} friends left to go")
 
 print("All Friends added. Closing")
+client.closeclient()
+userTable.close
 sys.exit(0)
 
     

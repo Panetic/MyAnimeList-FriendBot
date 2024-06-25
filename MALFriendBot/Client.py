@@ -1,7 +1,7 @@
 import logging
 import time
 import os
-from functions.database import Database
+from MALFriendBot.database import Database
 import random
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
@@ -12,32 +12,32 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 
 logging.getLogger("selenium.webdriver.remote.remote_connection").setLevel(logging.WARNING)
-userTable = Database()
 
+os.environ['WDM_LOCAL'] = '1'
 
 class MALFriendClient:
     def __init__(self, headless: bool = True):
         self.driver = self.createclient(headless)
+        self.userTable = Database()
         self.globalstart = time.time()
 
     @staticmethod
     def createclient(headless):
-        # Set up Chrome options
+        # Set up Chrome driver
         chrome_options = Options()
         if headless:
             chrome_options.add_argument("--headless")  # Run Chrome in headless mode
         chrome_options.add_argument("--log-level=3")
-
-        # Set up Chrome driver
-        os.environ['WDM_LOCAL'] = '1'
         driver_service = webdriver.ChromeService(ChromeDriverManager().install())
         driver = webdriver.Chrome(service=driver_service, options=chrome_options)
         return driver
 
     def closeclient(self):
         self.driver.quit()
+        self.userTable.close()
 
     def mallogin(self, username: str, password: str):
+        #Navigate to Login page and enter login
         self.driver.get("https://myanimelist.net/login.php")
         self.driver.find_element(By.ID, "loginUserName").send_keys(username)
         self.driver.find_element(By.ID, "login-password").send_keys(password + Keys.ENTER)
@@ -47,11 +47,13 @@ class MALFriendClient:
         return login
 
     def getusers(self):
+        #Navigate to Users Page
         tabs = self.driver.window_handles
         self.driver.switch_to.window(tabs[1])
         self.driver.get("https://myanimelist.net/users.php")
         time.sleep(2)
 
+        #Create a list of the user elements
         element_list = self.driver.find_elements(By.XPATH, "//*[@class='borderClass']/div[1]/a")
         friends = list()
         for element in element_list:
@@ -60,6 +62,8 @@ class MALFriendClient:
 
     def adduser(self, username, message):
         start = time.time()
+
+        #Navigate to User Profile
         tabs = self.driver.window_handles
         self.driver.switch_to.window(tabs[1])
         self.driver.get("https://myanimelist.net/profile" + "/" + username)
@@ -68,7 +72,7 @@ class MALFriendClient:
         # Check if user exists
         is404 = len(self.driver.find_elements(By.CLASS_NAME, "error404"))
 
-        # Check if request is available
+        # Check if request is available (Disabled Friend Requests)
         is_request = len(self.driver.find_elements(By.CSS_SELECTOR,
                                                    ".user-profile .user-function .icon-user-function.icon-request.disabled i.fas"))
 
@@ -86,15 +90,16 @@ class MALFriendClient:
 
         if is_friend > 0:
             print(username + " is already a friend")
-            userTable.add_user(username)
+            self.userTable.add_user(username)
             return False
 
         if is_comment > 0 and message is not None:
-            # Add Some Comments
+            # Navigate to Comment Box
             comments = WebDriverWait(self.driver, 10).until(
                 ec.visibility_of_element_located((By.CLASS_NAME, "textarea")))
             comments.send_keys(message)
 
+            #Send Profile Comment
             submit_button = WebDriverWait(self.driver, 10).until(
                 ec.visibility_of_element_located((By.XPATH, "//*[@id='lastcomment']/div/form/div/input")))
             submit_button.click()
@@ -109,14 +114,17 @@ class MALFriendClient:
             sleeptime = random.randint(26, 35) - (end - start)
             time.sleep(sleeptime)
 
+            #Click Request Button on user profile
             request = WebDriverWait(self.driver, 10).until(
                 ec.visibility_of_element_located((By.XPATH, "//*[@id='request']")))
             request.click()
 
+            #First Friend request attempt
             request_submit = WebDriverWait(self.driver, 10).until(
                 ec.visibility_of_element_located((By.XPATH, "//*[@id='dialog']/tbody/tr/td/form/div[3]/input[1]")))
             request_submit.click()
 
+            #Redundant Friend request attempt
             if len(self.driver.find_elements(By.CLASS_NAME, "badresult")) > 0:
                 print(f"Adding {username} failed. Retrying...")
                 self.driver.back()
@@ -131,7 +139,7 @@ class MALFriendClient:
             realend = time.time()
             print(f"{username} Added after {realend - self.globalstart} seconds")
             self.globalstart = time.time()
-            userTable.add_user(username)
+            self.userTable.add_user(username)
 
             return True
         except Exception as e:
