@@ -1,6 +1,6 @@
-from functions.database import Database
+from MALFriendBot.database import Database
+from MALFriendBot.Client import MALFriendClient
 from dotenv import load_dotenv
-from Client import MALFriendClient
 import os
 import sys
 import argparse
