@@ -131,7 +131,7 @@ class MALFriendClient:
                     return False
 
             realend = time.time()
-            print(f"{username} Added after {round(realend - self.globalstart)} seconds")
+            print(f"[{round(realend - self.globalstart,1)}s] {username} added")
             self.globalstart = time.time()
             self.userTable.add_user(username)
 
