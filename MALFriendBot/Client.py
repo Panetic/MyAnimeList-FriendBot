@@ -89,7 +89,6 @@ class MALFriendClient:
             return False
 
         if is_friend > 0:
-            print(username + " is already a friend")
             self.userTable.add_user(username)
             return False
 
@@ -103,10 +102,7 @@ class MALFriendClient:
             submit_button = WebDriverWait(self.driver, 10).until(
                 ec.visibility_of_element_located((By.XPATH, "//*[@id='lastcomment']/div/form/div/input")))
             submit_button.click()
-
             time.sleep(2)
-        elif is_comment == 0 and message is not None:
-            print("User Doesn't have Comments Turned On")
 
         try:
 
@@ -126,18 +122,16 @@ class MALFriendClient:
 
             #Redundant Friend request attempt
             if len(self.driver.find_elements(By.CLASS_NAME, "badresult")) > 0:
-                print(f"Adding {username} failed. Retrying...")
                 self.driver.back()
                 time.sleep(10)
                 request_submit = WebDriverWait(self.driver, 10).until(
                     ec.visibility_of_element_located((By.XPATH, "//*[@id='dialog']/tbody/tr/td/form/div[3]/input[1]")))
                 request_submit.click()
                 if len(self.driver.find_elements(By.CLASS_NAME, "badresult")) > 0:
-                    print(f"Retry Failed.")
                     return False
 
             realend = time.time()
-            print(f"{username} Added after {realend - self.globalstart} seconds")
+            print(f"{username} Added after {round(realend - self.globalstart)} seconds")
             self.globalstart = time.time()
             self.userTable.add_user(username)
 

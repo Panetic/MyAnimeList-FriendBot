@@ -13,12 +13,15 @@ parser.add_argument('-n', type=int, default=20, help='Number of Friends you wish
 parser.add_argument("--message", type=str, default=None, help="Message to send to prospective friends")
 parser.add_argument("--username", type=str, default=os.getenv("MALusername"), help="Username Login for MAL")
 parser.add_argument("--password", type=str, default=os.getenv("MALpassword"), help="password Login for MAL")
+parser.add_argument("-a", action='store_false', help="Skip Setting Check")
 args = parser.parse_args()
-
-print(f"Settings:\nFriends to add: {args.n}\nmessage: {args.message}\nheadless: {args.headless}")
-settingcheck = input("Press Enter to Start. Other input will cancel\n")
-if settingcheck != "":
-    sys.exit(0)
+if args.a:
+    print(f"Settings:\nFriends to add: {args.n}\nmessage: {args.message}\nheadless: {args.headless}")
+    settingcheck = input("Press Enter to Start. Other input will cancel\n")
+    if settingcheck != "":
+        sys.exit(0)
+    os.system('cls')
+    
 
 client = MALFriendClient(headless=args.headless)
 
@@ -42,7 +45,8 @@ while friends <= args.n:
             if friends >= args.n:
                 friends += 1
                 break
-            print(f"{args.n-friends} friends left to go")
+            if friends % 5 == 0:
+                print(f"{args.n-friends} friends left to go")
 
 print("All Friends added. Closing")
 client.closeclient()

@@ -46,6 +46,7 @@ The code supports several runtime arguments:
 
 - `--visible` to run the browser in visible mode (default is headless mode).
 - `-n VALUE` to specify the number of friends to add (default is 20).
+- `-a` to disable initial settings check
 - `--message` to provide an optional message to post to profiles.
 - `--username` to override the `.env` username.
 - `--password` to override the `.env` password.
@@ -55,4 +56,4 @@ The code supports several runtime arguments:
 To run the bot with all arguments:
 
 ```sh
-python main.py --visible -n 25 --message "Hello, let's be friends" --username "example" --password "password"
+python main.py --visible -n 25  -a --message "Hello, let's be friends" --username "example" --password "password"
