@@ -112,21 +112,21 @@ class MALFriendClient:
 
             #Click Request Button on user profile
             request = WebDriverWait(self.driver, 10).until(
-                ec.visibility_of_element_located((By.XPATH, "//*[@id='request']")))
-            request.click()
+                ec.element_to_be_clickable((By.XPATH, "//*[@id='request']")))
+            self.driver.execute_script("arguments[0].click();", request)
 
             #First Friend request attempt
             request_submit = WebDriverWait(self.driver, 10).until(
-                ec.visibility_of_element_located((By.XPATH, "//*[@id='dialog']/tbody/tr/td/form/div[3]/input[1]")))
-            request_submit.click()
+                ec.element_to_be_clickable((By.XPATH, "//*[@id='dialog']/tbody/tr/td/form/div[3]/input[1]")))
+            self.driver.execute_script("arguments[0].click();", request_submit)
 
             #Redundant Friend request attempt
             if len(self.driver.find_elements(By.CLASS_NAME, "badresult")) > 0:
                 self.driver.back()
                 time.sleep(10)
                 request_submit = WebDriverWait(self.driver, 10).until(
-                    ec.visibility_of_element_located((By.XPATH, "//*[@id='dialog']/tbody/tr/td/form/div[3]/input[1]")))
-                request_submit.click()
+                    ec.element_to_be_clickable((By.XPATH, "//*[@id='dialog']/tbody/tr/td/form/div[3]/input[1]")))
+                self.driver.execute_script("arguments[0].click();", request_submit)
                 if len(self.driver.find_elements(By.CLASS_NAME, "badresult")) > 0:
                     return False
 
