@@ -107,7 +107,7 @@ class MALFriendClient:
         try:
 
             end = time.time()
-            sleeptime = random.randint(26, 35) - (end - start)
+            sleeptime = random.randint(21, 30) - (end - start)
             time.sleep(sleeptime)
 
             #Click Request Button on user profile
@@ -128,6 +128,7 @@ class MALFriendClient:
                     ec.element_to_be_clickable((By.XPATH, "//*[@id='dialog']/tbody/tr/td/form/div[3]/input[1]")))
                 self.driver.execute_script("arguments[0].click();", request_submit)
                 if len(self.driver.find_elements(By.CLASS_NAME, "badresult")) > 0:
+                    print(f"{username} couldn't be added. Friend request was sent too quickly")
                     return False
 
             realend = time.time()
