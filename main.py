@@ -39,7 +39,7 @@ while friends <= args.n:
     users = userTable.user_check(users)
     if len(users) == 0:
         continue
-    for username in users:
+    for username in users[:10]:
         if client.adduser(username, message=args.message):
             friends += 1
             if friends >= args.n:
