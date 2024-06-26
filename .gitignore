@@ -1,9 +1,10 @@
 __pycache__/
 
 .env
-.wdm
 
 .vscode/
 .idea/
+.venv/
+.wdm/
 
 Users.db
