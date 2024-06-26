@@ -16,7 +16,7 @@ parser.add_argument("--password", type=str, default=os.getenv("MALpassword"), he
 parser.add_argument("-a", action='store_false', help="Skip Setting Check")
 args = parser.parse_args()
 if args.a:
-    print(f"Settings:\nFriends to add: {args.n}\nmessage: {args.message}\nheadless: {args.headless}")
+    print(f"Settings:\nFriends: {args.n}\nmessage: {args.message}\nheadless: {args.headless}")
     settingcheck = input("Press Enter to Start. Other input will cancel\n")
     if settingcheck != "":
         sys.exit(0)
